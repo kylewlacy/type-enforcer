@@ -36,6 +36,14 @@ describe TypeEnforcer do
       123.enforce {|n| n + 1 > 5}.should == 123
       4.enforce {|n| n + 1 > 5}.should be_nil
     end
+
+    it "raises or returns a custom error or object" do
+      '123A'.enforce(:is_numeric?, error: 3).should == 3
+
+      expect do
+        '123A'.enforce(:is_numeric?, error: ArgumentError)
+      end.to raise_error(ArgumentError)
+    end
   end
 
   describe "#enforce!" do

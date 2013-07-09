@@ -5,11 +5,13 @@ module TypeEnforcer
 
   refine Object do
     def enforce(*args, &block)
+      options = TypeEnforcer.build_options(args, error: nil)
+
       if block_given?
         if try(*args, &block)
           self
         else
-          nil
+          TypeEnforcer.raise_or_return(options[:error])
         end
       else
         case type = args.first
@@ -17,24 +19,21 @@ module TypeEnforcer
           if TypeEnforcer.try(type, self, *args[1..-1]) || try(*args)
             self
           else
-            nil
+            TypeEnforcer.raise_or_return(options[:error])
           end
         else
           if self.acts_as?(type)
             self.try(:convert_to, *args) || self
           else
-            nil
+            TypeEnforcer.raise_or_return(options[:error])
           end
         end
       end
     end
     alias_method :e, :enforce
 
-    def enforce!(type)
-      enforced = enforce(type)
-
-      raise NotFulfilledError if enforced.nil?
-      enforced
+    def enforce!(*args, &block)
+      enforce(*args, {error: NotFulfilledError}, &block)
     end
     alias_method :e!, :enforce!
 
@@ -76,5 +75,13 @@ module TypeEnforcer
     end
 
     defaults.merge(options)
+  end
+
+  def self.raise_or_return(error)
+    if error.is_a?(Class) && error <= Exception
+      raise error
+    else
+      error
+    end
   end
 end
