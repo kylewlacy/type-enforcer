@@ -45,9 +45,12 @@ module TypeEnforcer
       !nil?
     end
 
-    def present!
-      raise NotPresentError unless present?
-      self
+    def present!(error: NotPresentError)
+      if present?
+        TypeEnforcer.raise_or_return(error)
+      else
+        self
+      end
     end
     alias_method :p!, :present!
 

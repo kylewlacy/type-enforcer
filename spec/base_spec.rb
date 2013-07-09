@@ -41,8 +41,8 @@ describe TypeEnforcer do
       '123A'.enforce(:is_numeric?, error: 3).should == 3
 
       expect do
-        '123A'.enforce(:is_numeric?, error: ArgumentError)
-      end.to raise_error(ArgumentError)
+        '123A'.enforce(:is_numeric?, error: TestError)
+      end.to raise_error(TestError)
     end
   end
 
@@ -75,6 +75,11 @@ describe TypeEnforcer do
       '1234'.present!.should == '1234'
       expect { nil.present! }.to raise_error(TypeEnforcer::NotPresentError)
     end
+
+    it "raises or returns a custom error or object" do
+      nil.present!(error: 5).should == 5
+      expect { nil.present(error: TestError) }.to raiseError(TestError)
+    end
   end
 
   describe "#try" do
@@ -91,7 +96,7 @@ describe TypeEnforcer do
     it "rescues specified errors" do
       1234.try(:to_s, 37).should be_nil
       expect do
-        1234.try(:to_s, 37, rescues: NoMethodError)
+        1234.try(:to_s, 37, rescues: TestError)
       end.to raise_error(ArgumentError)
     end
   end
