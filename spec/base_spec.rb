@@ -32,6 +32,9 @@ describe TypeEnforcer do
     it "states whether or not an object meets a condition" do
       '1234'.enforce(:is_numeric?).should == '1234'
       '123A'.enforce(:is_numeric?).should be_nil
+
+      123.enforce {|n| n + 1 > 5}.should == 123
+      4.enforce {|n| n + 1 > 5}.should be_nil
     end
   end
 

@@ -4,12 +4,28 @@ module TypeEnforcer
   class NotPresentError < Error; end
 
   refine Object do
-    def enforce(type)
-      case type
-      when Symbol
-        TypeEnforcer.try(type, self) || try(type) ? self : nil
+    def enforce(*args, &block)
+      if block_given?
+        if try(*args, &block)
+          self
+        else
+          nil
+        end
       else
-        self.acts_as?(type) ? self.try(:convert_to, type) || self : nil
+        case type = args.first
+        when Symbol
+          if TypeEnforcer.try(type, self, *args[1..-1]) || try(*args)
+            self
+          else
+            nil
+          end
+        else
+          if self.acts_as?(type)
+            self.try(:convert_to, *args) || self
+          else
+            nil
+          end
+        end
       end
     end
     alias_method :e, :enforce
