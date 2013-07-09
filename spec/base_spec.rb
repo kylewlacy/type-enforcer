@@ -36,10 +36,10 @@ describe TypeEnforcer do
   describe "#enforce!" do
     it "ensures an object meets a condition" do
       'asdf'.enforce!(String).should == 'asdf'
-      expect { :asdf.enforce!(String) }.to raise_error(TypeEnforcer::TypeError)
+      expect { :asdf.enforce!(String) }.to raise_error(TypeEnforcer::NotFulfilledError)
 
       '1234'.enforce!(:is_numeric?).should == '1234'
-      expect { '123A'.enforce!(:is_numeric?) }.to raise_error(TypeEnforcer::TypeError)
+      expect { '123A'.enforce!(:is_numeric?) }.to raise_error(TypeEnforcer::NotFulfilledError)
     end
   end
 
@@ -60,7 +60,7 @@ describe TypeEnforcer do
   describe "#present!" do
     it "ensures an object is present" do
       '1234'.present!.should == '1234'
-      expect { nil.present! }.to raise_error(TypeEnforcer::TypeError)
+      expect { nil.present! }.to raise_error(TypeEnforcer::NotPresentError)
     end
   end
 

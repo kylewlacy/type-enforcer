@@ -1,6 +1,7 @@
 module TypeEnforcer
   class Error < StandardError; end
-  class TypeError < StandardError; end
+  class NotFulfilledError < Error; end
+  class NotPresentError < Error; end
 
   refine Object do
     def enforce(type)
@@ -16,7 +17,7 @@ module TypeEnforcer
     def enforce!(type)
       enforced = enforce(type)
 
-      raise TypeError if enforced.nil?
+      raise NotFulfilledError if enforced.nil?
       enforced
     end
     alias_method :e!, :enforce!
@@ -30,7 +31,7 @@ module TypeEnforcer
     end
 
     def present!
-      raise TypeError if nil?
+      raise NotPresentError unless present?
       self
     end
     alias_method :p!, :present!
