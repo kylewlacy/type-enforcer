@@ -36,12 +36,29 @@ module TypeEnforcer
     end
     alias_method :p!, :present!
 
-    def try(method, *args)
-      send(method, *args) if respond_to?(method)
+    def try(*args)
+      options = TypeEnforcer.build_options(args, rescues: StandardError)
+      begin
+        if block_given?
+          yield(self, *args)
+        else
+          send(*args)
+        end
+      rescue options[:rescues]
+        nil
+      end
     end
 
     def blank?
       nil? || try(:empty?)
     end
+  end
+
+  def self.build_options(options, defaults)
+    if options.is_a?(Array)
+      options = options.last.is_a?(Hash) ? options.pop : {}
+    end
+
+    defaults.merge(options)
   end
 end

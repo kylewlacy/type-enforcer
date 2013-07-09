@@ -2,6 +2,8 @@ require 'rspec'
 require './lib/type-enforcer/base.rb'
 
 module Helpers
+  class TestError < StandardError; end
+
   def is_numeric?(string = nil)
     !(/^\d+$/ =~ string).nil?
   end
@@ -68,6 +70,18 @@ describe TypeEnforcer do
     it "calls a method on an object if possible" do
       '1234'.try(:split, '2').should == ['1', '34']
       ['1', '2', '3', '4'].try(:split, '2').should be_nil
+    end
+
+    it "tries to run a block" do
+      '1234'.try {|s| s.to_i + 1}.should == 1235
+      ['1', '2', '3', '4'].try  {|a| a.split << 5 }.should be_nil
+    end
+
+    it "rescues specified errors" do
+      1234.try(:to_s, 37).should be_nil
+      expect do
+        1234.try(:to_s, 37, rescues: NoMethodError)
+      end.to raise_error(ArgumentError)
     end
   end
 
