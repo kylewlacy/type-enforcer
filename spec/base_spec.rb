@@ -78,7 +78,7 @@ describe TypeEnforcer do
 
     it "raises or returns a custom error or object" do
       nil.present!(error: 5).should == 5
-      expect { nil.present(error: TestError) }.to raiseError(TestError)
+      expect { nil.present!(error: TestError) }.to raise_error(TestError)
     end
   end
 

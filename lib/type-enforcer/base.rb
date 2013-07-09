@@ -46,7 +46,7 @@ module TypeEnforcer
     end
 
     def present!(error: NotPresentError)
-      if present?
+      unless present?
         TypeEnforcer.raise_or_return(error)
       else
         self
