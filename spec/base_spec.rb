@@ -95,9 +95,20 @@ describe TypeEnforcer do
 
     it "rescues specified errors" do
       1234.try(:to_s, 37).should be_nil
+
       expect do
         1234.try(:to_s, 37, rescues: TestError)
       end.to raise_error(ArgumentError)
+    end
+
+    it "raises or returns a custom error or object" do
+      1234.try(:to_s, 36, error: 4).should == 'ya'
+      1234.try(:to_s, 37, error: 4).should == 4
+
+      1234.try(:to_s, 36, error: TestError).should == 'ya'
+      expect do
+        1234.try(:to_s, 37, error: TestError)
+      end.to raise_error(TestError)
     end
   end
 

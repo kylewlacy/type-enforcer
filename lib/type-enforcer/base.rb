@@ -55,15 +55,16 @@ module TypeEnforcer
     alias_method :p!, :present!
 
     def try(*args)
-      options = TypeEnforcer.build_options(args, rescues: StandardError)
+      options = TypeEnforcer.build_options(args, rescues: StandardError, error: nil)
+      # (block_given? ? yield(self, *args) : send(*args)) rescue nil
       begin
         if block_given?
           yield(self, *args)
         else
           send(*args)
         end
-      rescue options[:rescues]
-        nil
+      rescue options[:rescues] || StandardError
+        TypeEnforcer.raise_or_return(options[:error])
       end
     end
 
